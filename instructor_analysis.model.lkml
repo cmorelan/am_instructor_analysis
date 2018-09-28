@@ -1,19 +1,10 @@
-connection: "snowflake_dev"
+#connection: "snowflake_dev"
 
-##include: "*.view.lkml"                       # include all views in this project
-# include: "my_dashboard.dashboard.lookml"   # include a LookML dashboard called my_dashboard
+include: "*.view.lkml"
+include: "instructor_analysis_base.model.lkml"
 
-# # Select the views that should be a part of this model,
-# # and define the joins that connect them together.
+# explore: course_instructor  { hidden: yes }
 #
-# explore: order_items {
-#   join: orders {
-#     relationship: many_to_one
-#     sql_on: ${orders.id} = ${order_items.order_id} ;;
-#   }
-#
-#   join: users {
-#     relationship: many_to_one
-#     sql_on: ${users.id} = ${orders.user_id} ;;
-#   }
-# }
+# explore: section_instructor { hidden: yes }
+
+# explore: instructor_union {}

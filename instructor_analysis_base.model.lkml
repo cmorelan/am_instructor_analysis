@@ -2,11 +2,16 @@
 
 include: "/webassign/webassign.model.lkml"
 include: "/webassign/*.view.lkml"
+include: "*.view.lkml"
 
 
+ explore: course_instructor  { hidden: yes }
+ explore: section_instructor { hidden: yes }
+ explore: wa_instructor_union {}
 
-explore: wa_fact_registration {
-  extends: [fact_registration]
+
+ explore: wa_fact_registration {
+    extends: [fact_registration]
   sql_always_where:
   (
     (
@@ -58,9 +63,5 @@ explore: wa_fact_registration {
     )
   );;
 
-#   join: wa_dim_section {
-#     from: dim_section
-#     sql_on: ${fact_registration.dim_section_id}=${dim_section.dim_section_id} ;;
-#     relationship: many_to_one
-#   }
+#  join: wa_instructor_union {}  # Need to union entire wa_fact_registration
 }
