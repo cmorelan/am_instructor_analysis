@@ -1,47 +1,24 @@
-#connection: "snowflake_webassign"
+
 
   include: "*.view.lkml"
-# include: "/webassign/*.view.lkml"
-# include: "/webassign/webassig*.model.lkml"
-#  include: "instructor_analysis_base.model.lkml"  # need this to be able to pull from both DEV and WEBASSIGN
-# #include: "wa_fact_registration.view.lkml"
-# include: "am_wa_contact_namesparsed.view.lkml"
- include: "/webassign/webassign.model.lkml"   # need this to be able to pull from both DEV and WEBASSIGN
- include: "/webassign/webassign.dims.model.lkml"
-
-# explore: fact_registration_ext {
-#   extends: [wa_fact_registration]
-#   from: wa_fact_registration
-#   view_label: "TEST"
-
-#   join: am_wa_contact_namesparsed {
-#     sql_table_name: DEV.ZCM.AM_WA_CONTACT_NAMESPARSED ;;
-#     type: left_outer
-#     relationship: many_to_many
-#     sql_on: ${fact_registration.instructor_id}=${am_wa_contact_namesparsed.instructor_id}  ;;
-#   }
-#}
+  include: "instructor_analysis_base.model.lkml"  # need this to be able to pull from both DEV and WEBASSIGN
+  include: "/webassign/webassig*.model.lkml"   # need this to be able to pull from both DEV and WEBASSIGN
+#  include: "/webassign/responses.view.lkml"
+#  include: "/webassign/dim_section.view.lkml"
 
 
-# explore: wa_fact_registration {
-#   label: "WebAssign Instructor"
-#   from: wa_fact_registration
-# #  extends: [fact_registration]
-#   view_label: "ACTIVATIONS TEST"
-# #  fields: [fact_registration*, -course_instructor_id, -section_instructor_id]
-#
-#
-# join: am_wa_contact_namesparsed {
-# #  sql_table_name: DEV.ZCM.am_wa_contact_namesparsed ;;
-#   type: inner
-#   relationship: many_to_many
-#   sql_on: ${wa_fact_registration.instructor_id}=${am_wa_contact_namesparsed.instructor_id} ;;
-# }
+explore: wa_fact_registration {}
 
-# join: wa_instructor_union {
-#   type: inner
-#   relationship: many_to_one
-#   sql_on: (${dim_section.course_instructor_id}=${wa_instructor_union.instructor_id}
-#     OR ${dim_section.section_instructor_id}=${wa_instructor_union.instructor_id});;
-# }  # Need to union entire wa_fact_registration
-#}
+explore: wa_fact_registration_extended {
+  extends: [fact_registration]    ### Extending fact_registration model from webassign project (from snowflake DATABASE.SCHEMA: WEBASSIGN.FR_OLAP_REGISTRATION_REPORTS)
+  from: wa_fact_registration    ### Using Unioned fact_registration derived table defined in wa_fact_registration.view.lkml file
+ fields: [fact_registration*, dim_section*, dim_product_family*, dim_discipline*, dim_time*, dim_faculty*, dim_school*, dim_textbook*
+    , am_wa_contact_namesparsed*, -fact_registration.course_instructor_id, -fact_registration.section_instructor_id]    ################ Including all fields from wa_fact_registration & other tables in model -course and section instructor ID fields
+
+  join: am_wa_contact_namesparsed {
+    sql_table_name: DEV.ZCM.AM_WA_CONTACT_NAMESPARSED ;;
+    type: left_outer
+    relationship: many_to_many
+    sql_on: ${fact_registration.instructor_id}=${am_wa_contact_namesparsed.instructor_id}  ;;
+  }
+}

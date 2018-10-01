@@ -1,7 +1,7 @@
 #   include: "wa_fact_registration.view.lkml"
 #   include: "*.view.lkml"
 #   include: "/webassign/webassign.model.lkml"
-#   include: "instructor_analysi*.model.lkml"
+ #  include: "instructor_analysi*.model.lkml"
 
 view: am_wa_contact_namesparsed {
 #  extends: [wa_fact_registration]
