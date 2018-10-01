@@ -1,73 +1,112 @@
-# include: "/webassign/webassign.model.lkml"
-# include: "/webassign/webassign.dims.model.lkml"
-include: "/webassign/fact_registration.view.lkml"
+#  include: "/webassign/dim_section.view.lkml"
+#  include: "/webassign/dim_discipline.view.lkml"
+#  include: "/webassign/fact_registration.view.lkml"
+#  include: "am_wa_contact_namesparsed.view.lkml"
+#  include: "instructor_analysi*.model.lkml"
 
-view: wa_fact_registration {
-  # # You can specify the table name if it's different from the view name:
-  # sql_table_name: my_schema_name.tester ;;
-  #
-  # # Define your dimensions and measures here, like this:
-  # dimension: user_id {
-  #   description: "Unique ID for each user that has ordered"
-  #   type: number
-  #   sql: ${TABLE}.user_id ;;
-  # }
-  #
-  # dimension: lifetime_orders {
-  #   description: "The total number of orders for each user"
-  #   type: number
-  #   sql: ${TABLE}.lifetime_orders ;;
-  # }
-  #
-  # dimension_group: most_recent_purchase {
-  #   description: "The date when each user last ordered"
-  #   type: time
-  #   timeframes: [date, week, month, year]
-  #   sql: ${TABLE}.most_recent_purchase_at ;;
-  # }
-  #
-  # measure: total_lifetime_orders {
-  #   description: "Use this for counting lifetime orders across many users"
-  #   type: sum
-  #   sql: ${lifetime_orders} ;;
-  # }
-}
 
-# view: am_fact_registration {
-#   # Or, you could make this view a derived table, like this:
+# view: wa_fact_registration {
+#   extends: [fact_registration]
 #   derived_table: {
-#     sql: SELECT
-#         user_id as user_id
-#         , COUNT(*) as lifetime_orders
-#         , MAX(orders.created_at) as most_recent_purchase_at
-#       FROM orders
-#       GROUP BY user_id
-#       ;;
+#     sql:
+# WITH u AS (--
+#   SELECT
+#         f.FACT_REGISTRATION_ID
+#       , f.DIM_TIME_ID
+#       , f.NET_SALES_REVENUE
+#       , f.DIM_PAYMENT_METHOD_ID
+#       , f.UPGRADES
+#       , f.DIM_SECTION_ID
+#       , f.SSO_GUID
+#       , f.REDEMPTION_MODEL
+#       , f.EVENT_TYPE
+#       , f.TOKEN_ID
+#       , f.SCHOOL_ID
+#       , f.SECTION_ID
+# --      , sec.DIM_DISCIPLINE_ID AS SECTION_DIM_DISCIPLINE_ID
+#       , f.DIM_TEXTBOOK_ID
+#  --     , t.DIM_DISCIPLINE_ID AS TEXTBOOK_DIM_DISCIPLINE_ID
+#       , f.PURCHASE_TYPE
+#       , f.COURSE_ID
+#       , f.GROSS_SALES_REVENUE
+#       , f.REGISTRATIONS
+#       , f.COUNT AS NUM_REGISTRATIONS
+#       , f.COURSE_INSTRUCTOR_ID AS INSTRUCTOR_ID
+#       , f.DIM_SCHOOL_ID
+#       , f.USER_ID
+#       , f.DIM_AXSCODE_ID
+#       , f.USERNAME
+#     FROM WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.FACT_REGISTRATION AS f
+# --    LEFT JOIN ${dim_section.SQL_TABLE_NAME} AS sec ON f.DIM_SECTION_ID = sec.DIM_SECTION_ID
+# --    LEFT JOIN ${dim_school.SQL_TABLE_NAME} sch ON f.DIM_SCHOOL_ID = sch.DIM_SCHOOL_ID--WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_SCHOOL  AS sch
+# --    LEFT JOIN ${dim_textbook.SQL_TABLE_NAME} t ON f.DIM_TEXTBOOK_ID = t.DIM_TEXTBOOK_ID ----WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_TEXTBOOK  AS t
+# --    WHERE (sec.DIM_DISCIPLINE_ID IN (54,18,21,15,20,19,51,48,16,17,2) OR T.DIM_DISCIPLINE_ID IN (54,18,21,15,20,19,51,48,16,17,2))
+# UNION
+#   SELECT
+#         f.FACT_REGISTRATION_ID
+#       , f.DIM_TIME_ID
+#       , f.NET_SALES_REVENUE
+#       , f.DIM_PAYMENT_METHOD_ID
+#       , f.UPGRADES
+#       , f.DIM_SECTION_ID
+#       , f.SSO_GUID
+#       , f.REDEMPTION_MODEL
+#       , f.EVENT_TYPE
+#       , f.TOKEN_ID
+#       , f.SCHOOL_ID
+#       , f.SECTION_ID
+# --       , sec.DIM_DISCIPLINE_ID AS SECTION_DIM_DISCIPLINE_ID
+#       , f.DIM_TEXTBOOK_ID
+# --      , t.DIM_DISCIPLINE_ID AS TEXTBOOK_DIM_DISCIPLINE_ID
+#       , f.PURCHASE_TYPE
+#       , f.COURSE_ID
+#       , f.GROSS_SALES_REVENUE
+#       , f.REGISTRATIONS
+#       , f.COUNT AS NUM_REGISTRATIONS
+#       , f.SECTION_INSTRUCTOR_ID AS INSTRUCTOR_ID
+#       , f.DIM_SCHOOL_ID
+#       , f.USER_ID
+#       , f.DIM_AXSCODE_ID
+#       , f.USERNAME
+#     FROM WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.FACT_REGISTRATION AS f
+# --    LEFT JOIN ${dim_section.SQL_TABLE_NAME} AS sec ON f.DIM_SECTION_ID = sec.DIM_SECTION_ID
+# --    LEFT JOIN ${dim_school.SQL_TABLE_NAME} sch ON f.DIM_SCHOOL_ID = sch.DIM_SCHOOL_ID--WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_SCHOOL  AS sch
+# --    LEFT JOIN ${dim_textbook.SQL_TABLE_NAME} t ON f.DIM_TEXTBOOK_ID = t.DIM_TEXTBOOK_ID ----WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_TEXTBOOK  AS t
+# --    WHERE (sec.DIM_DISCIPLINE_ID IN (54,18,21,15,20,19,51,48,16,17,2) OR T.DIM_DISCIPLINE_ID IN (54,18,21,15,20,19,51,48,16,17,2))
+# )
+# SELECT
+#         fact_registration_id||instructor_id as pk
+#       , *
+# FROM u
+#     ;;
 #   }
 #
-#   # Define your dimensions and measures here, like this:
-#   dimension: user_id {
-#     description: "Unique ID for each user that has ordered"
-#     type: number
-#     sql: ${TABLE}.user_id ;;
-#   }
+#   dimension: pk {type: number primary_key: yes}
+#   dimension: fact_registration_id { type: number primary_key: no}
+#   dimension: dim_time_id { type: number }
+#   dimension: net_sales_revenue { type: number }
+#   dimension: dim_payment_method_id { type: number }
+#   dimension: upgrades { type: number }
+#   dimension: dim_section_id { type: number }
+#   dimension: sso_guid { type: string }
+#   dimension: redemption_model { type: string }
+#   dimension: event_type { type: string }
+#   dimension: token_id { type: number }
+#   dimension: school_id { type: number }
+#   dimension: section_id { type: number }
+# #   dimension: section_dim_discipline_id { type: number }
+#   dimension: dim_textbook_id { type: number }
+# #   dimension: textbook_dim_discipline_id { type: number }
+#   dimension: purchase_type { type: string }
+#   dimension: course_id { type: number }
+#   dimension: gross_sales_revenue { type: number }
+#   dimension: registrations { type: number }
+#   dimension: num_registrations { type: number }
+#   dimension: instructor_id { type: number }
+#   dimension: dim_school_id { type: number }
+#   dimension: user_id { type: number }
+#   dimension: dim_axscode_id { type: number }
+#   dimension: username { type: string }
 #
-#   dimension: lifetime_orders {
-#     description: "The total number of orders for each user"
-#     type: number
-#     sql: ${TABLE}.lifetime_orders ;;
-#   }
 #
-#   dimension_group: most_recent_purchase {
-#     description: "The date when each user last ordered"
-#     type: time
-#     timeframes: [date, week, month, year]
-#     sql: ${TABLE}.most_recent_purchase_at ;;
-#   }
-#
-#   measure: total_lifetime_orders {
-#     description: "Use this for counting lifetime orders across many users"
-#     type: sum
-#     sql: ${lifetime_orders} ;;
-#   }
 # }
