@@ -139,7 +139,7 @@ FROM u
   dimension: gross_sales_revenue { type: number }
    dimension: registrations { type: number }
   dimension: registration_count { type: number label: "Registration Count"}
-  dimension: instructor_id { type: number }
+  dimension: instructor_id { label: "      Instructor ID" type: number view_label:"Instructor" group_label:" Instructor"}
   dimension: dim_school_id { type: number }
   dimension: user_id { type: number }
   dimension: dim_axscode_id { type: number }
