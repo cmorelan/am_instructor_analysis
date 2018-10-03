@@ -17,7 +17,7 @@ SELECT
     , CASE WHEN course_instructor_id=section_instructor_id THEN 'Same' ELSE 'Different' END AS same_diff
 FROM WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_SECTION
 )
-, u AS (
+, udsiu AS (
      SELECT
         DISTINCT dim_section_id
         , course_instructor_id AS instructor_id
@@ -45,11 +45,11 @@ UNION
   FROM sd
   WHERE same_diff='Same'
 )
-select * from u;;
+select * from udsiu;;
   }
 
   dimension: dim_section_id { primary_key: yes sql: ${TABLE}.dim_section_id;; hidden: yes group_label: " Instructor"}
-  dimension: instructor_id { sql: ${TABLE}.instructor_id;; group_label:"Instructor" hidden: yes}
+  dimension: instructor_id { sql: ${TABLE}.instructor_id;;label:"     Instructor ID"   group_label: " Instructor" hidden: no}
 
   dimension: instructor_lvl {
     label: "Instructor Type"

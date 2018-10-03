@@ -1,5 +1,5 @@
 view: wa_textbook_grtopic {
-  view_label: "Textbook"
+  view_label: "Discipline"
   sql_table_name: DEV.ZCM.WA_TEXTBOOK_GRTOPIC ;;
 
 

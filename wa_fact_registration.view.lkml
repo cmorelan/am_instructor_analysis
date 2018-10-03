@@ -62,6 +62,8 @@ WITH u AS (--
           OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring15' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring16' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring17' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring18' )
           OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer15' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer16' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer17' ) OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer18' )
           ))
+--       AND((dim_textbook.DIM_TEXTBOOK_ID != '2220' AND dim_textbook.DIM_TEXTBOOK_ID is not null
+--           ))
 UNION
   SELECT
         f.FACT_REGISTRATION_ID as fact_registration_id
@@ -110,6 +112,8 @@ UNION
           OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring15' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring16' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring17' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Spring18' )
           OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer15' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer16' )  OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer17' ) OR UPPER( dim_time.TIMESCHOOLSEMESTERDESC )= UPPER( 'Summer18' )
           ))
+--      AND((dim_textbook.DIM_TEXTBOOK_ID != '2220' AND dim_textbook.DIM_TEXTBOOK_ID is not null
+--          ))
 )
 SELECT
         fact_registration_id||instructor_id as pk
@@ -118,32 +122,54 @@ FROM u
     ;;
   }
 
-  dimension: pk {type: number primary_key: yes}
-  dimension: fact_registration_id { type: number primary_key: no}
-  dimension: dim_time_id { type: number }
-  dimension: net_sales_revenue { type: number }
-  dimension: dim_payment_method_id { type: number }
-  dimension: upgrades { type: number }
-   dimension: dim_section_id { type: number primary_key: no }
-  dimension: sso_guid { type: string }
-  dimension: redemption_model { type: string }
-  dimension: event_type { type: string }
-  dimension: token_id { type: number }
-  dimension: school_id { type: number }
-  dimension: section_id { type: number primary_key: no }
-#   dimension: section_dim_discipline_id { type: number }
-  dimension: dim_textbook_id { type: number }
-#   dimension: textbook_dim_discipline_id { type: number }
-  dimension: purchase_type { type: string }
-  dimension: course_id { type: number }
-  dimension: gross_sales_revenue { type: number }
-   dimension: registrations { type: number }
-  dimension: registration_count { type: number label: "Registration Count"}
-  dimension: instructor_id { label: "      Instructor ID" type: number view_label:"Instructor" group_label:" Instructor"}
-  dimension: dim_school_id { type: number }
-  dimension: user_id { type: number }
-  dimension: dim_axscode_id { type: number }
-  dimension: username { type: string }
+########################################################################### KEYS ####################################################################################
+
+  dimension: pk                        { type: number group_label: "Foreign_keys" primary_key: yes}
+  dimension: fact_registration_id      { type: number group_label: "Foreign_keys" primary_key: no}
+  dimension: dim_time_id               { type: number group_label: "Foreign_keys" }
+  dimension: dim_payment_method_id     { type: number group_label: "Foreign_keys" }
+  dimension: dim_section_id            { type: number group_label: "Foreign_keys" hidden: no primary_key: no }
+  dimension: dim_textbook_id           { type: number group_label: "Foreign_keys" }
+  dimension: instructor_id             { type: number group_label: "Foreign_keys" }
+  dimension: course_id                 { type: number group_label: "Foreign_keys" }
+  dimension: dim_school_id             { type: number group_label: "Foreign_keys" }
+  dimension: user_id                   { type: number group_label: "Foreign_keys" }
+  dimension: dim_axscode_id            { type: number group_label: "Foreign_keys" }
+  dimension: upgrades                  { type: number group_label: "Foreign_keys" }
+  dimension: token_id                  { type: number group_label: "Foreign_keys" }
+  dimension: school_id                 { type: number group_label: "Foreign_keys" }
+  dimension: section_id                { type: number group_label: "Foreign_keys" primary_key: no }
+
+########################################################################## USER DETAILS #############################################################################
+
+  dimension: sso_guid                  { type: string group_label: "User Details"}
+  dimension: username                  { type: string group_label: "User Details"}
+
+
+######################################################################## AGGREGATIONS ###############################################################################
+
+
+  dimension: redemption_model          { type: string group_label: "Sales Related" }
+  dimension: event_type                { type: string group_label: "Sales Related" }
+  dimension: purchase_type             { type: string group_label: "Sales Related" }
+  dimension: gross_sales_revenue       { type: number group_label: "Sales Related" }
+  dimension: net_sales_revenue         { type: number group_label: "Sales Related" }
+  dimension: registrations             { type: number group_label: "Registrations" }
+  dimension: registration_count        { type: number group_label: "Registrations" label: "Registration Count"}
+
+  measure: user_registrations {
+    label: "Number of Registrations (activations)"
+    description: "Total Activations"
+    type: sum_distinct
+    sql_distinct_key: ${fact_registration_id} ;;
+    sql: ${registrations} ;;
+
+    drill_fields: [detail*]
+  }
+
+measure: count_all {
+  type: count
+}
 
 
 }
