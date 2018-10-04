@@ -17,6 +17,7 @@ view: wa_fact_registration {
 WITH u AS (--
   SELECT
         f.FACT_REGISTRATION_ID as fact_registration_id
+      , f.DIM_SECTION_ID||F.COURSE_INSTRUCTOR_ID as section_instructor_key
       , f.DIM_TIME_ID as dim_time_id
       , f.NET_SALES_REVENUE as net_sales_revenue
       , f.DIM_PAYMENT_METHOD_ID as dim_payment_method_id
@@ -67,6 +68,7 @@ WITH u AS (--
 UNION
   SELECT
         f.FACT_REGISTRATION_ID as fact_registration_id
+      , f.DIM_SECTION_ID||F.SECTION_INSTRUCTOR_ID as section_instructor_key
       , f.DIM_TIME_ID as dim_time_id
       , f.NET_SALES_REVENUE as net_sales_revenue
       , f.DIM_PAYMENT_METHOD_ID as dim_payment_method_id
@@ -124,21 +126,22 @@ FROM u
 
 ########################################################################### KEYS ####################################################################################
 
-  dimension: pk                        { type: number group_label: "Foreign_keys" primary_key: yes}
-  dimension: fact_registration_id      { type: number group_label: "Foreign_keys" primary_key: no}
-  dimension: dim_time_id               { type: number group_label: "Foreign_keys" }
-  dimension: dim_payment_method_id     { type: number group_label: "Foreign_keys" }
-  dimension: dim_section_id            { type: number group_label: "Foreign_keys" hidden: no primary_key: no }
-  dimension: dim_textbook_id           { type: number group_label: "Foreign_keys" }
-  dimension: instructor_id             { type: number group_label: "Foreign_keys" }
-  dimension: course_id                 { type: number group_label: "Foreign_keys" }
-  dimension: dim_school_id             { type: number group_label: "Foreign_keys" }
-  dimension: user_id                   { type: number group_label: "Foreign_keys" }
-  dimension: dim_axscode_id            { type: number group_label: "Foreign_keys" }
-  dimension: upgrades                  { type: number group_label: "Foreign_keys" }
-  dimension: token_id                  { type: number group_label: "Foreign_keys" }
-  dimension: school_id                 { type: number group_label: "Foreign_keys" }
-  dimension: section_id                { type: number group_label: "Foreign_keys" primary_key: no }
+  dimension: pk                        { type: number group_label: "Foreign Keys" primary_key: yes}
+  dimension: fact_registration_id      { type: number group_label: "Foreign Keys" primary_key: no}
+  dimension: dim_time_id               { type: number group_label: "Foreign Keys" }
+  dimension: dim_payment_method_id     { type: number group_label: "Foreign Keys" }
+  dimension: dim_section_id            { type: number group_label: "Foreign Keys" hidden: no primary_key: no }
+  dimension: section_instructor_key    { type: number group_label: "Foreign Keys" description: "Dim_section_id||instructor_id key as foreign key for dim_section table"}
+  dimension: dim_textbook_id           { type: number group_label: "Foreign Keys" }
+  dimension: instructor_id             { type: number group_label: "Foreign Keys" }
+  dimension: course_id                 { type: number group_label: "Foreign Keys" }
+  dimension: dim_school_id             { type: number group_label: "Foreign Keys" }
+  dimension: user_id                   { type: number group_label: "Foreign Keys" }
+  dimension: dim_axscode_id            { type: number group_label: "Foreign Keys" }
+  dimension: upgrades                  { type: number group_label: "Foreign Keys" }
+  dimension: token_id                  { type: number group_label: "Foreign Keys" }
+  dimension: school_id                 { type: number group_label: "Foreign Keys" }
+  dimension: section_id                { type: number group_label: "Foreign Keys" primary_key: no }
 
 ########################################################################## USER DETAILS #############################################################################
 

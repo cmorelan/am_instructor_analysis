@@ -7,7 +7,7 @@ view: wa_dim_school {
 
 ##################################################################  IDENTIFIERS #####################################################################
 
-  dimension: dim_school_id         { hidden: no primary_key: yes  label:"     Dim School ID"}
+  dimension: dim_school_id         { hidden: yes primary_key: yes  label:"     Dim School ID"}
   dimension: school_id             { hidden: yes                   label:"    School ID"}
   dimension: sf_account_id         { hidden: yes }
   dimension: code                  { label: "   School Code" group_label:"   School Info"}

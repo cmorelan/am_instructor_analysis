@@ -1,11 +1,126 @@
 include: "/webassign/dim_section.view.lkml"
 include: "/webassign/webassig*.model.lkml"
+include: "wa_fact_registration.view.lkml"
 
 view: wa_dim_section {
   extends: [dim_section]
+  derived_table: {
+    sql:
+, usect AS (
+    SELECT
+      DISTINCT f.SECTION_INSTRUCTOR_KEY
+    , s.DIM_SECTION_ID
+    , s.COURSE_ID
+    , s.COURSE_INSTRUCTOR_EMAIL AS instructor_email
+    , s.COURSE_INSTRUCTOR_ID  AS instructor_id
+    , s.COURSE_INSTRUCTOR_NAME AS instructor_name
+    , s.COURSE_INSTRUCTOR_SF_ID AS instructor_sf_id
+    , s.COURSE_INSTRUCTOR_USERNAME AS instructor_username
+    , CASE WHEN s.COURSE_INSTRUCTOR_ID=s.SECTION_INSTRUCTOR_ID THEN 'Course & Section Instructor' ELSE 'Course Instructor' END AS instructor_lvl_for_section
+    , s.COURSE_NAME
+    , s.CREATED_EASTERN
+    , s.DATE_FROM
+    , s.DATE_TO
+    , s.DEPLOYMENTS
+    , s.DIM_DISCIPLINE_ID
+    , s.DIM_TEXTBOOK_ID
+    , s.DIM_TIME_ID_CREATED
+    , s.DIM_TIME_ID_ENDS
+    , s.DIM_TIME_ID_LEEWAY
+    , s.DIM_TIME_ID_STARTS
+    , s.ENDS_EASTERN
+    , s.GB_CONFIGURED
+    , s.GB_HAS_DATA
+    , s.GRANTED_EBOOK
+    , s.HAS_INVOICE
+    , s.LEEWAY_EASTERN
+    , s.MEETS
+    , s.PSP_ENABLED
+    , s.PSP_MODE
+    , s.PSP_STUDENTS_ATTEMPTING_QUIZ
+    , s.PSP_STUDENTS_ATTEMPTING_TEST
+    , s.REGISTRATIONS
+    , s.ROSTER
+    , s.SCHOOL_ID
+    , s.SECTION_ID
+    , s.SECTION_NAME
+    , s.STARTS_EASTERN
+    , s.TERM
+    , s.TERM_DESCRIPTION
+    , s.TRASHED
+    , s.USING_OPEN_RESOURCES
+    , s.VERSION
+    , s.YEAR
+    , s._FIVETRAN_DELETED
+    , s._FIVETRAN_SYNCED
+    , instructor_id||'-'||DENSE_RANK() OVER (PARTITION BY instructor_id ORDER BY instructor_name asc) AS dist_instructor_name_id
+  FROM ${wa_fact_registration.SQL_TABLE_NAME} as f
+  INNER JOIN webassign.ft_olap_registration_reports.dim_section AS s ON f.SECTION_INSTRUCTOR_KEY = s.dim_section_id||s.course_instructor_id
+UNION
+  SELECT
+      DISTINCT f.SECTION_INSTRUCTOR_KEY
+    , s.DIM_SECTION_ID
+    , s.COURSE_ID
+    , s.SECTION_INSTRUCTOR_EMAIL AS instructor_email
+    , s.SECTION_INSTRUCTOR_ID  AS instructor_id
+    , s.SECTION_INSTRUCTOR_NAME AS instructor_name
+    , s.SECTION_INSTRUCTOR_SF_ID AS instructor_sf_id
+    , s.SECTION_INSTRUCTOR_USERNAME AS instructor_username
+    , CASE WHEN s.SECTION_INSTRUCTOR_ID=s.COURSE_INSTRUCTOR_ID THEN 'Course & Section Instructor' ELSE 'Section Instructor' END AS instructor_lvl_for_section
+    , s.COURSE_NAME
+    , s.CREATED_EASTERN
+    , s.DATE_FROM
+    , s.DATE_TO
+    , s.DEPLOYMENTS
+    , s.DIM_DISCIPLINE_ID
+    , s.DIM_TEXTBOOK_ID
+    , s.DIM_TIME_ID_CREATED
+    , s.DIM_TIME_ID_ENDS
+    , s.DIM_TIME_ID_LEEWAY
+    , s.DIM_TIME_ID_STARTS
+    , s.ENDS_EASTERN
+    , s.GB_CONFIGURED
+    , s.GB_HAS_DATA
+    , s.GRANTED_EBOOK
+    , s.HAS_INVOICE
+    , s.LEEWAY_EASTERN
+    , s.MEETS
+    , s.PSP_ENABLED
+    , s.PSP_MODE
+    , s.PSP_STUDENTS_ATTEMPTING_QUIZ
+    , s.PSP_STUDENTS_ATTEMPTING_TEST
+    , s.REGISTRATIONS
+    , s.ROSTER
+    , s.SCHOOL_ID
+    , s.SECTION_ID
+    , s.SECTION_NAME
+    , s.STARTS_EASTERN
+    , s.TERM
+    , s.TERM_DESCRIPTION
+    , s.TRASHED
+    , s.USING_OPEN_RESOURCES
+    , s.VERSION
+    , s.YEAR
+    , s._FIVETRAN_DELETED
+    , s._FIVETRAN_SYNCED
+    , instructor_id||'-'||DENSE_RANK() OVER (PARTITION BY instructor_id ORDER BY instructor_name asc) AS dist_instructor_name_id
+FROM ${wa_fact_registration.SQL_TABLE_NAME} as f
+INNER JOIN webassign.ft_olap_registration_reports.dim_section AS s ON f.SECTION_INSTRUCTOR_KEY = s.dim_section_id||s.section_instructor_id
+)
+SELECT
+    usect.*
+    , np.INSTRUCTOR_FNAME
+    , np.INSTRUCTOR_MIDDLENAME
+    , np.INSTRUCTOR_LNAME
+FROM usect
+LEFT JOIN DEV.ZCM.AM_WA_CONTACT_NAMESPARSED as np ON usect.dim_section_id||usect.dist_instructor_name_id = np.dim_section_id||np.dist_instructor_name_id
+    ;;
+  }
 
-
-#   dimension: dim_section_id     {primary_key: yes  }
+   dimension: dim_section_id                {label: "     Dim Section ID" primary_key: no  hidden: no}
+   dimension: section_instructor_key        {view_label: "Instructor" primary_key: yes }
+   dimension: dist_instructor_name_id       {view_label: "Instructor" description: "Unique identifier for instructor ids with more than one record for instructor name"}
+   dimension: instructor_lvl_for_section    {view_label: "Instructor" description: "is the Course Instructor, Section Instructor, or Both Course & Section Instructor from dim_section_id"}
 
 
 
@@ -15,28 +130,41 @@ view: wa_dim_section {
 #########################################################################################################################################
 
 
-#------------------------------------------------ Course Instructor --------------------------------------------------------------------#
+    dimension: instructor_id         {label: "     Instructor ID"         view_label: "Instructor" }
+    dimension: instructor_name       {label: "    Instructor Full Name"    view_label: "Instructor"}
+    dimension: instructor_email      {label: " Instructor Email"        view_label: "Instructor"}
+    dimension: instructor_sf_id      {label: "Instructor SF ID"        view_label: "Instructor" hidden: yes}
+    dimension: instructor_username   {label: "User Name"               view_label: "Instructor"}
+    dimension: instructor_fname      {label: "   Instructor First Name"   view_label: "Instructor"}
+    dimension: instructor_middlename {label: "   Instructor Middle Name"  view_label: "Instructor"}
+    dimension: instructor_lname      {label: "  Instructor Last Name"    view_label: "Instructor"}
 
-  dimension: course_instructor_id {view_label:"Instructor" }
-  dimension: course_instructor_name {view_label: "Instructor"}
-  dimension: course_instructor_email {view_label: "Instructor"  }
-  dimension: course_instructor_sf_id {view_label: "Instructor"  }
-  dimension: course_instructor_username {view_label: "Instructor"  }
-
-  measure: course_instructor_count {view_label: "Instructor" group_label:"Course Instructor Details"}
+    measure: instructor_count        {view_label: "Instructor"}
 
 
+#------------------------------------------------ Course Instructor (Hidden b/c of Union PDT) --------------------------------------------------------------------#
+
+  dimension: course_instructor_id          {hidden: yes view_label:"Instructor" }
+  dimension: course_instructor_name        {hidden: yes view_label: "Instructor"}
+  dimension: course_instructor_email       {hidden: yes view_label: "Instructor"  }
+  dimension: course_instructor_sf_id       {hidden: yes view_label: "Instructor"  }
+  dimension: course_instructor_username    {hidden: yes view_label: "Instructor"  }
 
 
-#------------------------------------------------- Section Instructor -------------------------------------------------------------------#
+  measure: course_instructor_count        {hidden: yes view_label: "Instructor" group_label:"Course Instructor Details"}
 
-  dimension: section_instructor_id { view_label: "Instructor" }
-  dimension: section_instructor_name { view_label: "Instructor" }
-  dimension: section_instructor_username { view_label: "Instructor" }
-  dimension: section_instructor_sf_id {view_label: "Instructor"     }
-  dimension: section_instructor_email {view_label: "Instructor"  }
 
-  measure: sect_instructor_count{view_label: "Instructor" group_label:"Section Instructor Details"}
+
+
+#------------------------------------------------- Section Instructor (Hidden b/c of Union PDT) -------------------------------------------------------------------#
+
+  dimension: section_instructor_id         {hidden: yes view_label: "Instructor" }
+  dimension: section_instructor_name       {hidden: yes view_label: "Instructor" }
+  dimension: section_instructor_username   {hidden: yes view_label: "Instructor" }
+  dimension: section_instructor_sf_id      {hidden: yes view_label: "Instructor"     }
+  dimension: section_instructor_email      {hidden: yes view_label: "Instructor"  }
+
+  measure: sect_instructor_count           {hidden: yes view_label: "Instructor" group_label:"Section Instructor Details"}
 
 
 
@@ -54,7 +182,7 @@ view: wa_dim_section {
 
 #---------------------------------------------------- Section -------------------------------------------------------------------------#
 
-  dimension: section_id         { group_label: " Section Level"  }
+  dimension: section_id         { group_label: " Section Level" primary_key: no  }
   dimension: class_key          { group_label: " Section Level" }
   dimension: section_name       { group_label: " Section Level" }
   dimension: meets              {  }
@@ -204,6 +332,21 @@ view: wa_dim_section {
   dimension: psp_students_attempting_quiz         {hidden: yes  }
   dimension: version                              {hidden: yes  }
 
+set: dim_section_crs_sect_instructor {
+  fields: [
+            course_instructor_id
+            , course_instructor_name
+            , course_instructor_email
+            , course_instructor_sf_id
+            , course_instructor_username
+            , section_instructor_id
+            , section_instructor_name
+            , section_instructor_username
+            , section_instructor_sf_id
+            , section_instructor_email
+            , course_instructor_count
+            , sect_instructor_count
+          ]
+        }
 
-
-  }
+    }
