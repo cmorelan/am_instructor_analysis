@@ -3,7 +3,7 @@
 #   include: "/webassign/webassign.model.lkml"
  #  include: "instructor_analysi*.model.lkml"
 
-view: am_wa_contact_namesparsed {
+view: zam_wa_contact_namesparsed {
   view_label: "Instructor"
 #  extends: [wa_fact_registration]
   sql_table_name: DEV.ZCM.AM_WA_CONTACT_NAMESPARSED ;;

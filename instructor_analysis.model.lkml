@@ -6,10 +6,10 @@
 
 
 
-explore: wa_dim_section {}
-explore: wa_dim_section_instructor_union {}
-explore: wa_fact_registration {}
-explore: wa_dim_school {}
+explore: wa_dim_section {hidden: yes}
+explore: zwa_dim_section_instructor_union {hidden: yes}
+explore: wa_fact_registration { hidden: yes}
+explore: wa_dim_school {hidden: yes}
 
 
 

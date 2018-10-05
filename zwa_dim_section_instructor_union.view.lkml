@@ -1,7 +1,7 @@
 include: "/webassign/webassig*.model.lkml"
 include: "instructor_analysis.model.lkml"
 
-view: wa_dim_section_instructor_union {
+view: zwa_dim_section_instructor_union {
   view_label: "Instructor"
   derived_table: {
     sql:
