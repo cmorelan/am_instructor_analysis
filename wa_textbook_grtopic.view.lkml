@@ -18,6 +18,7 @@ view: wa_textbook_grtopic {
     sql: ${TABLE}."GROUPED_TOPIC" ;;
   }
 
+dimension: topic_lvl { sql: ${TABLE}.topic_lvl;;}
 
 
 

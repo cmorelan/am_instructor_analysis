@@ -11,6 +11,16 @@ explore: zwa_dim_section_instructor_union {hidden: yes}
 explore: wa_fact_registration { hidden: yes}
 explore: wa_dim_school {hidden: yes}
 
+explore: dim_contact { from: dim_contact
+  join: dim_topic {
+    relationship: one_to_many
+    type: left_outer
+    sql_on:
+    ${dim_contact.dim_contact_id}=${dim_topic.dim_contact_id}
+    ;;
+  }
+  }
+explore: dim_topic { from: dim_topic}
 
 
 
@@ -24,15 +34,13 @@ explore: wa_fact_registration_extended {
 
   fields: [
              wa_dim_section*
-#            , wa_dim_section_instructor_union*
            , fact_registration*
-           ,  dim_product_family*
+           , dim_product_family*
            , dim_discipline*
            , dim_time*
            , wa_dim_school*
            , wa_dim_textbook*
-#            , am_wa_contact_namesparsed*
-               , wa_textbook_grtopic.grouped_topic
+               , wa_textbook_grtopic.grouped_topic, wa_textbook_grtopic.topic_lvl
                , -fact_registration.course_instructor_id, -fact_registration.section_instructor_id
                , -dim_section.course_instructor_id, -dim_section.course_instructor_name, -dim_section.course_instructor_email , -dim_section.course_instructor_sf_id, -dim_section.course_instructor_username
                , -dim_section.section_instructor_id, -dim_section.section_instructor_name, -dim_section.section_instructor_username, -dim_section.section_instructor_sf_id, -dim_section.section_instructor_email
