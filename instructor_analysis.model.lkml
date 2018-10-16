@@ -10,6 +10,7 @@ explore: wa_dim_section {hidden: yes}
 explore: zwa_dim_section_instructor_union {hidden: yes}
 explore: wa_fact_registration { hidden: yes}
 explore: wa_dim_school {hidden: yes}
+explore: dim_institution {hidden: yes}
 
 explore: dim_contact { from: dim_contact
   join: dim_topic {
@@ -18,6 +19,11 @@ explore: dim_contact { from: dim_contact
     sql_on:
     ${dim_contact.dim_contact_id}=${dim_topic.dim_contact_id}
     ;;
+  }
+  join: dim_institution {
+    relationship: many_to_one
+    type: left_outer
+    sql_on: ${dim_contact.entity_no} = ${dim_institution.dim_entity_no} ;;
   }
   }
 explore: dim_topic { from: dim_topic}

@@ -178,5 +178,9 @@ dimension: topic_lvl {
   type: string
   description: "Advanced Math vs Lower-Level"
 }
+measure: count_courses {
+  type: count_distinct
+  sql: ${topic_bucket} ;;
+}
 
 }

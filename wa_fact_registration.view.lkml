@@ -48,7 +48,7 @@ WITH u AS (--
     INNER JOIN WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_TIME  AS dim_time ON f.dim_time_id = dim_time.DIM_TIME_ID
     WHERE
           ((UPPER( dim_section.COURSE_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%cengage%' ) AND UPPER(  dim_section.COURSE_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%webassign%' )
-          AND UPPER(  dim_section.COURSE_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%openstax%' ) OR  dim_section.COURSE_INSTRUCTOR_EMAIL IS NULL
+          AND UPPER(  dim_section.COURSE_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%openstax%' ) AND  UPPER(  dim_section.COURSE_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%obfuscate%' ) OR  dim_section.COURSE_INSTRUCTOR_EMAIL IS NULL
           ))
       AND((
           UPPER( dim_school.COUNTRY_NAME )= UPPER( 'United States' ) OR UPPER( dim_school.COUNTRY_NAME )= UPPER( 'Canada' )
@@ -99,7 +99,7 @@ UNION
     INNER JOIN WEBASSIGN.FT_OLAP_REGISTRATION_REPORTS.DIM_TIME  AS dim_time ON f.dim_time_id = dim_time.DIM_TIME_ID
     WHERE
           ((UPPER(dim_section.SECTION_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%cengage%' ) AND UPPER( dim_section.SECTION_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%webassign%' )
-          AND UPPER( dim_section.SECTION_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%openstax%' ) OR dim_section.SECTION_INSTRUCTOR_EMAIL IS NULL
+          AND UPPER( dim_section.SECTION_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%openstax%' ) AND  UPPER(  dim_section.SECTION_INSTRUCTOR_EMAIL ) NOT LIKE UPPER( '%obfuscate%' ) OR dim_section.SECTION_INSTRUCTOR_EMAIL IS NULL
           ))
       AND((
           UPPER( dim_school.COUNTRY_NAME )= UPPER( 'United States' ) OR UPPER( dim_school.COUNTRY_NAME )= UPPER( 'Canada' )
